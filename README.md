@@ -61,8 +61,15 @@ Feel free to modify the language mappers and add more mappings according to your
 
 #### Execution:
 
+This run attempts to recursively search for strings.xml and Locatable.strings
+
 ```bash
-python export-translation.py
+python3 export-translation.py
+```
+Or you can pass by parameters the language resources sources for export.
+
+```bash
+python3 export-translation.py  -androidSources android/src/main/res/ -iosSources ios/Supporting\ Files/
 ```
 
 ### 2. Import to Android (strings.xml)

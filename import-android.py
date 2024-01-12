@@ -9,9 +9,9 @@ def load_android_translations():
     """
     texts_android = {}
     android_language_mapper = {
-        'INGLES': 'values-en',
-        'CASTELLANO': 'values',
-        'FRANCÉS': 'values-fr',
+        'SPANISH': 'values',
+        'ENGLISH': 'values-en',
+        'FRENCH': 'values-fr'
         # Adjust keys as needed
     }
 

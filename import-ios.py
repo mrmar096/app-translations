@@ -9,9 +9,9 @@ def load_ios_translations():
     """
     texts_ios = {}
     ios_language_mapper = {
-        'INGLES': 'en.lproj',
-        'CASTELLANO': 'es.lproj',
-        'FRANCÉS': 'fr.lproj'
+        'SPANISH': 'es.lproj',
+        'ENGLISH': 'en.lproj',
+        'FRENCH': 'fr.lproj'
         # Add more mappings as needed
     }
 
