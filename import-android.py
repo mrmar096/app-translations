@@ -11,13 +11,7 @@ def load_android_translations():
     android_language_mapper = {
         'INGLES': 'values-en',
         'CASTELLANO': 'values',
-        'EUSKERA': 'values-eu',
-        'GALLEGO': 'values-gl',
-        'ITALIANO': 'values-it',
-        'CATALÁN': 'values-ca',
         'FRANCÉS': 'values-fr',
-        'PORTUGUÉS': 'values-pt',
-        'VALENCIANO': 'values-zh'
         # Adjust keys as needed
     }
 
@@ -52,7 +46,7 @@ def create_update_xml_file(android_lang, texts_android, changes_android):
         # Create a new XML file and write translations from the Excel sheet
         root = ET.Element('resources')
         for key, value in texts_android.items():
-            if android_lang in value and value[android_lang] != 'SIN TRADUCIR':
+            if android_lang in value and value[android_lang] != 'UNTRANSLATED':
                 string_elem = ET.SubElement(root, 'string', name=key)
                 string_elem.text = value[android_lang]
 
@@ -74,19 +68,21 @@ def create_update_xml_file(android_lang, texts_android, changes_android):
 
         for key, value in texts_android.items():
             if key not in existing_keys:
-                if android_lang in value and value[android_lang] != 'SIN TRADUCIR':
-                    new_string_elem = ET.Element('string', name=key)
-                    new_string_elem.text = value[android_lang]
-                    root_elem.append(new_string_elem)
-                    changes_android[android_lang][key] = value[android_lang]
-                    print(f"Added new key \"{key}\" to {android_lang} with value {value[android_lang]}")
+                # If the key does not exist, add a new line with the translation from the Excel sheet
+                excel_value = value[android_lang].strip() if value[android_lang] else None
+                if excel_value is not None:
+                    if android_lang in value and excel_value != 'UNTRANSLATED':
+                        new_string_elem = ET.Element('string', name=key)
+                        new_string_elem.text = excel_value
+                        root_elem.append(new_string_elem)
+                        changes_android[android_lang][key] = excel_value
+                        print(f"Added new key \"{key}\" to {android_lang} with value {excel_value}")
 
-        # Apply indentation
-        ET.indent(tree, space="\t", level=0)
-
-        # Write the formatted text to the file
-        with open(xml_file, 'w', encoding='utf-8') as file:
-            file.write(ET.tostring(tree, encoding='utf-8', xml_declaration=True, pretty_print=True).decode())
+        if changes_android[android_lang]:
+            # Apply indentation
+            ET.indent(tree, space="\t", level=0)
+            with open(xml_file, 'w', encoding='utf-8') as file:
+                file.write(ET.tostring(tree, encoding='utf-8', xml_declaration=True, pretty_print=True).decode())
 
         for string_elem in root_elem.findall('.//string'):
             key = string_elem.get('name')
@@ -94,7 +90,7 @@ def create_update_xml_file(android_lang, texts_android, changes_android):
                 xml_value = string_elem.text.strip() if string_elem.text else None
                 excel_value = texts_android[key][android_lang].strip() if texts_android[key][android_lang] else None
                 if excel_value is not None:
-                    if excel_value != 'SIN TRADUCIR' and (xml_value is None or excel_value != xml_value):
+                    if excel_value != 'UNTRANSLATED' and (xml_value is None or excel_value != xml_value):
                         print(f"Updated {key} in {android_lang} to {excel_value}")
                         changes_android[android_lang][key] = excel_value
                         string_elem.text = excel_value

@@ -11,12 +11,7 @@ def load_ios_translations():
     ios_language_mapper = {
         'INGLES': 'en.lproj',
         'CASTELLANO': 'es.lproj',
-        'EUSKERA': 'eu-ES.lproj',
-        'GALLEGO': 'gl-ES.lproj',
-        'CATALÁN': 'ca-ES.lproj',
-        'FRANCÉS': 'fr.lproj',
-        'PORTUGUÉS': 'pt-PT.lproj',
-        'VALENCIANO': 'va-ES.lproj'
+        'FRANCÉS': 'fr.lproj'
         # Add more mappings as needed
     }
 
@@ -51,7 +46,7 @@ def create_update_strings_file(ios_lang, texts_ios, changes_ios):
         # Create a new .strings file and write translations from the Excel sheet
         with open(strings_file, 'w', encoding='utf-8') as ios_file:
             for key, value in texts_ios.items():
-                if ios_lang in value and value[ios_lang] != 'SIN TRADUCIR':
+                if ios_lang in value and value[ios_lang] != 'UNTRANSLATED':
                     ios_file.write("\"{}\" = \"{}\";\n".format(key, value[ios_lang]))
         print(f"\nCreated and populated file: {strings_file}")
     else:
@@ -59,6 +54,10 @@ def create_update_strings_file(ios_lang, texts_ios, changes_ios):
         print(f"\nFile: {strings_file}")
         with open(strings_file, 'r', encoding='utf-8') as ios_file:
             content = ios_file.readlines()
+
+        # Initialize changes_android[android_lang] if not exists
+        if ios_lang not in changes_ios:
+            changes_ios[ios_lang] = {}
 
         # Create a set of existing keys in the .strings file
         existing_keys = {line.split('=')[0].strip()[1:-1] for line in content if '=' in line}
@@ -68,10 +67,12 @@ def create_update_strings_file(ios_lang, texts_ios, changes_ios):
                 # Check if the key already exists in the .strings file
                 if key not in existing_keys:
                     # If the key does not exist, add a new line with the translation from the Excel sheet
-                    if ios_lang in value and value[ios_lang] != 'SIN TRADUCIR':
-                        ios_file.write("\"{}\" = \"{}\";\n".format(key, value[ios_lang]))
-                        changes_ios[ios_lang][key] = value[ios_lang]
-                        print(f"Added new key \"{key}\" to {ios_lang} with value {value[ios_lang]}")
+                    excel_value = value[ios_lang].strip() if value[ios_lang] else None
+                    if excel_value is not None:
+                        if ios_lang in value and excel_value != 'UNTRANSLATED':
+                            ios_file.write("\"{}\" = \"{}\";\n".format(key, excel_value))
+                            changes_ios[ios_lang][key] = excel_value
+                            print(f"Added new key \"{key}\" to {ios_lang} with value {excel_value}")
             ios_file.close()
 
         # Continue with updating translations in an existing .strings file
@@ -88,7 +89,7 @@ def create_update_strings_file(ios_lang, texts_ios, changes_ios):
                     strings_value = parts[1].strip()[1:-2].strip() if parts[1].strip() else None
                     excel_value = texts_ios[key][ios_lang].strip() if texts_ios[key][ios_lang] else None
                     if excel_value is not None:
-                        if strings_value is None or (excel_value != strings_value and excel_value != 'SIN TRADUCIR'):
+                        if strings_value is None or (excel_value != strings_value and excel_value != 'UNTRANSLATED'):
                             print(f"Updating {key} in {ios_lang} to {excel_value}")
                             content[i] = "\"{}\" = \"{}\";\n".format(key, excel_value)
 

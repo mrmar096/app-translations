@@ -5,15 +5,9 @@ import xml.etree.ElementTree as ET
 
 # Mapping of language names for Android
 android_language_mapper = {
-    'values-en': 'INGLES',
     'values': 'CASTELLANO',
-    'values-eu': 'EUSKERA',
-    'values-gl': 'GALLEGO',
-    'values-it': 'ITALIANO',
-    'values-ca': 'CATALÁN',
-    'values-fr': 'FRANCÉS',
-    'values-pt': 'PORTUGUÉS',
-    'values-zh': 'VALENCIANO'
+    'values-en': 'INGLES',
+    'values-fr': 'FRANCÉS'
     # Add more mappings as needed
 }
 
@@ -21,12 +15,7 @@ android_language_mapper = {
 ios_language_mapper = {
     'en.lproj': 'INGLES',
     'es.lproj': 'CASTELLANO',
-    'eu-ES.lproj': 'EUSKERA',
-    'gl-ES.lproj': 'GALLEGO',
-    'ca-ES.lproj': 'CATALÁN',
-    'fr.lproj': 'FRANCÉS',
-    'pt-PT.lproj': 'PORTUGUÉS',
-    'va-ES.lproj': 'VALENCIANO'
+    'fr.lproj': 'FRANCÉS'
     # Add more mappings as needed
 }
 
@@ -45,7 +34,7 @@ def process_android_file(file_path, language_name):
         if translatable_attr and translatable_attr.lower() == 'false':
             continue
 
-        value = string_elem.text.strip() if string_elem.text else "SIN TRADUCIR"
+        value = string_elem.text.strip() if string_elem.text else "UNTRANSLATED"
 
         if key not in texts_android:
             texts_android[key] = {}
@@ -59,7 +48,7 @@ def process_ios_file(file_path, language_name):
             parts = item.split("=")
             if len(parts) == 2:
                 key = parts[0].strip()[1:-1]
-                value = parts[1].strip()[1:-2].strip() if parts[1].strip() else "SIN TRADUCIR"
+                value = parts[1].strip()[1:-2].strip() if parts[1].strip() else "UNTRANSLATED"
 
                 if key not in texts_ios:
                     texts_ios[key] = {}
@@ -105,7 +94,7 @@ for i, _key in enumerate(texts_android.keys()):
         if _key in texts_android and lang_key in texts_android[_key]:
             worksheet_android.write(col, texts_android[_key][lang_key])
         else:
-            worksheet_android.write(col, "SIN TRADUCIR")
+            worksheet_android.write(col, "UNTRANSLATED")
 
 # iOS sheet
 worksheet_ios = workbook.add_worksheet('iOS')
@@ -125,6 +114,6 @@ for i, _key in enumerate(texts_ios.keys()):
         if _key in texts_ios and lang_key in texts_ios[_key]:
             worksheet_ios.write(col, texts_ios[_key][lang_key])
         else:
-            worksheet_ios.write(col, "SIN TRADUCIR")
+            worksheet_ios.write(col, "UNTRANSLATED")
 
 workbook.close()
