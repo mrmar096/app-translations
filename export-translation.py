@@ -127,7 +127,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Export translations to Excel.')
     parser.add_argument('-androidSources', type=str, help='Path to Android resources folder', default='./')
     parser.add_argument('-iosSources', type=str, help='Path to iOS resources folder', default='./')
-    parser.add_argument('-excelFile', type=str, help='Path to iOS resources folder', default=excelPath)
+    parser.add_argument('-excelFile', type=str, help='Excel worksheet file', default=excelPath)
     args = parser.parse_args()
 
     export_translations(args.androidSources, args.iosSources, args.excelFile)
