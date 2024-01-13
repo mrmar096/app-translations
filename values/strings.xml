@@ -1,6 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <resources>
-    <string name="app_name" translatable="false">Mi Aplicación</string>
-    <string name="welcome_message">¡Bienvenido!</string>
-    <string name="button_ok">Aceptar</string>
-    <string name="button_cancel">Cancelar</string>
+  <string name="button_ok">Aceptar</string>
+  <string name="button_cancel">Cancelar</string>
+  <string name="welcome_message">¡Bienvenido!</string>
 </resources>
