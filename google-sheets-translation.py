@@ -70,6 +70,18 @@ def process_ios_file(file_path, language_name):
 
                 texts_ios[key][language_name] = value
 
+def safe_gspread_request(func, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except APIError as e:
+        if 'RATE_LIMIT_EXCEEDED' in str(e):
+            # Retardo de 30 segundos si se alcanza el límite de cuota
+            print("Rate limit exceeded. Pausing for 60 seconds.")
+            time.sleep(60)
+            return safe_gspread_request(func, *args, **kwargs)
+        else:
+            raise e
+
 def export_translations(android_sources, ios_sources):
     # Process Android files
     for root, dirnames, filenames in os.walk(android_sources):
@@ -93,53 +105,52 @@ def export_translations(android_sources, ios_sources):
 
     # Create a new Google Sheets spreadsheet or open an existing one by key
     spreadsheet_key = '1-NMqveM5i1MUGNQITxJ7Kk_kk71YMUaUTvzIAEuDTp8'
-    spreadsheet = gc.open_by_key(spreadsheet_key)
+    spreadsheet = safe_gspread_request(gc.open_by_key, spreadsheet_key)
 
     # Android sheet
     worksheet_android = spreadsheet.get_worksheet(0)
     if worksheet_android is None:
-        worksheet_android = spreadsheet.add_worksheet(title='Android', rows=1, cols=1)
+        worksheet_android = safe_gspread_request(spreadsheet.add_worksheet, title='Android', rows=1, cols=1)
 
     # Write Android headers
     lang_index_android = 2
     for lang_key in android_language_mapper.values():
-        worksheet_android.update_cell(1, lang_index_android, lang_key)
+        safe_gspread_request(worksheet_android.update_cell, 1, lang_index_android, lang_key)
         lang_index_android += 1
 
     # Write Android data
     for i, _key in enumerate(texts_android.keys()):
-        worksheet_android.update_cell(i + 2, 1, _key)
+        safe_gspread_request(worksheet_android.update_cell, i + 2, 1, _key)
         for j, lang_key in enumerate(android_language_mapper.values()):
             if _key in texts_android and lang_key in texts_android[_key]:
-                worksheet_android.update_cell(i + 2, j + 2, texts_android[_key][lang_key])
+                safe_gspread_request(worksheet_android.update_cell, i + 2, j + 2, texts_android[_key][lang_key])
             else:
-                worksheet_android.update_cell(i + 2, j + 2, "UNTRANSLATED")
+                safe_gspread_request(worksheet_android.update_cell, i + 2, j + 2, "UNTRANSLATED")
 
     # iOS sheet
     worksheet_ios = spreadsheet.get_worksheet(1)
     if worksheet_ios is None:
-        worksheet_ios = spreadsheet.add_worksheet(title='iOS', rows=1, cols=1)
+        worksheet_ios = safe_gspread_request(spreadsheet.add_worksheet, title='iOS', rows=1, cols=1)
 
     # Write iOS headers
     lang_index_ios = 2
     for lang_key in ios_language_mapper.values():
-        worksheet_ios.update_cell(1, lang_index_ios, lang_key)
+        safe_gspread_request(worksheet_ios.update_cell, 1, lang_index_ios, lang_key)
         lang_index_ios += 1
 
     # Write iOS data
     for i, _key in enumerate(texts_ios.keys()):
-        worksheet_ios.update_cell(i + 2, 1, _key)
+        safe_gspread_request(worksheet_ios.update_cell, i + 2, 1, _key)
         for j, lang_key in enumerate(ios_language_mapper.values()):
             if _key in texts_ios and lang_key in texts_ios[_key]:
-                worksheet_ios.update_cell(i + 2, j + 2, texts_ios[_key][lang_key])
+                safe_gspread_request(worksheet_ios.update_cell, i + 2, j + 2, texts_ios[_key][lang_key])
             else:
-                worksheet_ios.update_cell(i + 2, j + 2, "UNTRANSLATED")
+                safe_gspread_request(worksheet_ios.update_cell, i + 2, j + 2, "UNTRANSLATED")
 
     print(f'Data exported to Google Sheets: {spreadsheet.url}')
 
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Export translations to Excel.')
+    parser = argparse.ArgumentParser(description='Export translations to Google Sheets.')
     parser.add_argument('-androidSources', type=str, help='Path to Android resources folder', default='./')
     parser.add_argument('-iosSources', type=str, help='Path to iOS resources folder', default='./')
     args = parser.parse_args()
