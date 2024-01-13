@@ -1,4 +1,4 @@
-"app_name" = "My App";
-"welcome_message" = "Welcome!";
-"button_ok" = "Ok";
 "button_cancel" = "Cancel";
+"button_ok" = "Ok";
+"welcome_message" = "Welcome!";
+"app_name" = "My App";
