@@ -16,7 +16,7 @@ In the Excel file, the structure follows this format:
 
 Sample Excel:
 
-![excel-sample.png](docs%2Fexcel-sample.png)
+![excel-example.png](docs%2Fexcel-example.png)
 
 Android Sheet:
 The script skip keys with translatable="false"
@@ -27,14 +27,9 @@ Column B and onward: Translations in respective languages based on the Android l
 ``` python
 # Mapping of language names for Android
 android_language_mapper = {
-    'values-en': 'INGLES',
-    'values': 'CASTELLANO',
-    'values-eu': 'EUSKERA',
-    'values-gl': 'GALLEGO',
-    'values-it': 'ITALIANO',
-    'values-ca': 'CATALÁN',
-    'values-fr': 'FRANCÉS',
-    'values-pt': 'PORTUGUÉS'
+    'values': 'SPANISH',
+    'values-en': 'ENGLISH',
+    'values-fr': 'FRENCH'
     # Add more mappings as needed
 }
 ```
@@ -47,13 +42,9 @@ Column B and onward: Translations in respective languages based on the iOS langu
 ``` python
 # Mapping of language names for iOS
 ios_language_mapper = {
-    'en.lproj': 'INGLES',
-    'es.lproj': 'CASTELLANO',
-    'eu-ES.lproj': 'EUSKERA',
-    'gl-ES.lproj': 'GALLEGO',
-    'ca-ES.lproj': 'CATALÁN',
-    'fr.lproj': 'FRANCÉS',
-    'pt-PT.lproj': 'PORTUGUÉS'
+    'es.lproj': 'SPANISH',
+    'en.lproj': 'ENGLISH',
+    'fr.lproj': 'FRENCH'
     # Add more mappings as needed
 }
 ```
