@@ -3,20 +3,19 @@ from openpyxl import load_workbook
 import codecs
 import json
 
-def load_ios_translations():
-    """
-    Load translations from the iOS Excel sheet.
-    """
-    texts_ios = {}
-    ios_language_mapper = {
-        'SPANISH': 'es.lproj',
-        'ENGLISH': 'en.lproj',
-        'FRENCH': 'fr.lproj'
-        # Add more mappings as needed
-    }
+texts_ios = {}
 
-    # Initialize dictionary for iOS changes
-    changes_ios = {}
+ios_language_mapper = {
+    'SPANISH': 'es.lproj',
+    'ENGLISH': 'en.lproj',
+    'FRENCH': 'fr.lproj'
+    # Add more mappings as needed
+}
+
+# Initialize dictionary for iOS changes
+changes_ios = {}
+
+def load_ios_translations():
 
     # Load iOS workbook
     wb_combined = load_workbook('app_translations.xlsx')
@@ -27,19 +26,15 @@ def load_ios_translations():
         key = sheet_ios.cell(row=row, column=1).value
         translations = {}
         for col in range(2, sheet_ios.max_column + 1):
-            ios_lang = ios_language_mapper.get(sheet_ios.cell(row=1, column=col).value, None)
-            if ios_lang is not None:
+            lang = ios_language_mapper.get(sheet_ios.cell(row=1, column=col).value, None)
+            if lang is not None:
                 translation = sheet_ios.cell(row=row, column=col).value
-                translations[ios_lang] = translation
+                translations[lang] = translation
         texts_ios[key] = translations
 
-    return texts_ios, ios_language_mapper, changes_ios
 
 
-def create_update_strings_file(ios_lang, texts_ios, changes_ios):
-    """
-    Create or update .strings file for iOS translations.
-    """
+def create_update_strings_file():
     strings_file = os.path.join(ios_lang, 'Localizable.strings')
 
     if not os.path.exists(strings_file):
@@ -105,23 +100,22 @@ def create_update_strings_file(ios_lang, texts_ios, changes_ios):
                 ios_file.write(output)
                 ios_file.close()
 
-    return changes_ios
 
+if __name__ == "__main__":
+    # Main script for iOS
+    load_ios_translations()
 
-# Main script for iOS
-texts_ios, ios_language_mapper, changes_ios = load_ios_translations()
+    print("Processing localization files for iOS:")
 
-print("Processing localization files for iOS:")
+    for ios_lang in ios_language_mapper.values():
+        if not os.path.exists(ios_lang):
+            os.makedirs(ios_lang)
 
-for ios_lang in ios_language_mapper.values():
-    if not os.path.exists(ios_lang):
-        os.makedirs(ios_lang)
+        create_update_strings_file()
 
-    changes_ios = create_update_strings_file(ios_lang, texts_ios, changes_ios)
-
-# Print information about the changes
-print("Changes:")
-if all(not changes for changes in changes_ios.values()):
-    print("No Changes")
-else:
-    print(json.dumps(changes_ios, indent=2, ensure_ascii=False).encode('utf-8').decode())
+    # Print information about the changes
+    print("Changes:")
+    if all(not changes for changes in changes_ios.values()):
+        print("No Changes")
+    else:
+        print(json.dumps(changes_ios, indent=2, ensure_ascii=False).encode('utf-8').decode())

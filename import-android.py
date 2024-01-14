@@ -3,21 +3,18 @@ from openpyxl import load_workbook
 import os
 import json
 
+texts_android = {}
+android_language_mapper = {
+    'SPANISH': 'values',
+    'ENGLISH': 'values-en',
+    'FRENCH': 'values-fr'
+    # Adjust keys as needed
+}
+
+# Initialize dictionary for Android changes
+changes_android = {}
+
 def load_android_translations():
-    """
-    Load translations from the Android Excel sheet.
-    """
-    texts_android = {}
-    android_language_mapper = {
-        'SPANISH': 'values',
-        'ENGLISH': 'values-en',
-        'FRENCH': 'values-fr'
-        # Adjust keys as needed
-    }
-
-    # Initialize dictionary for Android changes
-    changes_android = {}
-
     # Load Android workbook
     wb_android = load_workbook('app_translations.xlsx')
     sheet = wb_android['Android']  # Get the sheet named "Android"
@@ -27,19 +24,14 @@ def load_android_translations():
         key = sheet.cell(row=row, column=1).value
         translations = {}
         for col in range(2, sheet.max_column + 1):
-            android_lang = android_language_mapper.get(sheet.cell(row=1, column=col).value, None)
-            if android_lang is not None:
+            lang = android_language_mapper.get(sheet.cell(row=1, column=col).value, None)
+            if lang is not None:
                 translation = sheet.cell(row=row, column=col).value
-                translations[android_lang] = translation
+                translations[lang] = translation
         texts_android[key] = translations
 
-    return texts_android, android_language_mapper, changes_android
 
-
-def create_update_xml_file(android_lang, texts_android, changes_android):
-    """
-    Create or update XML file for Android translations.
-    """
+def create_update_xml_file():
     xml_file = os.path.join(android_lang, 'strings.xml')
 
     if not os.path.exists(xml_file):
@@ -101,24 +93,23 @@ def create_update_xml_file(android_lang, texts_android, changes_android):
             with open(xml_file, 'w', encoding='utf-8') as file:
                 file.write(ET.tostring(tree, encoding='utf-8', xml_declaration=True, pretty_print=True).decode())
 
-        return changes_android
 
 
+if __name__ == "__main__":
+    # Main script
+    load_android_translations()
 
-# Main script
-texts_android, android_language_mapper, changes_android = load_android_translations()
+    print("Processing localization files for Android:")
 
-print("Processing localization files for Android:")
+    for android_lang in android_language_mapper.values():
+        if not os.path.exists(android_lang):
+            os.makedirs(android_lang)
 
-for android_lang in android_language_mapper.values():
-    if not os.path.exists(android_lang):
-        os.makedirs(android_lang)
+        create_update_xml_file()
 
-    changes_android = create_update_xml_file(android_lang, texts_android, changes_android)
-
-# Print information about the changes
-print("\nChanges:")
-if all(not changes for changes in changes_android.values()):
-    print("No changes")
-else:
-    print(json.dumps(changes_android, indent=2, ensure_ascii=False).encode('utf-8').decode())
+    # Print information about the changes
+    print("\nChanges:")
+    if all(not changes for changes in changes_android.values()):
+        print("No changes")
+    else:
+        print(json.dumps(changes_android, indent=2, ensure_ascii=False).encode('utf-8').decode())
