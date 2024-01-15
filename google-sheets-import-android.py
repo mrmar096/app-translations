@@ -8,9 +8,9 @@ google_sheet_id = '1QCllfVqvAB08cBltn-iM3gogJYBMyRv2iBy8C3XytFU'
 gid='1225980718'
 
 android_language_mapper = {
-    'INGLES': 'values-en',
-    'CASTELLANO': 'values',
-    'FRANCÉS': 'values-fr'
+    'ENGLISH': 'values-en',
+    'SPANISH': 'values',
+    'FRENCH': 'values-fr'
     # Adjust keys as needed
 }
 

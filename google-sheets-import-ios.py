@@ -9,9 +9,9 @@ google_sheet_id = '1QCllfVqvAB08cBltn-iM3gogJYBMyRv2iBy8C3XytFU'
 gid='375629473'
 
 ios_language_mapper = {
-    'INGLES': 'en.lproj',
-    'CASTELLANO': 'es.lproj',
-    'FRANCÉS': 'fr.lproj'
+    'ENGLISH': 'en.lproj',
+    'SPANISH': 'es.lproj',
+    'FRENCH': 'fr.lproj'
     # Add more mappings as needed
 }
 

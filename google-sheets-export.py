@@ -13,16 +13,16 @@ google_sheet_url = f'https://docs.google.com/spreadsheets/d/{google_sheet_id}'
 
 # Mapping of language names for Android
 android_language_mapper = {
-    'values': 'CASTELLANO',
-    'values-en': 'INGLES',
-    'values-fr': 'FRANCÉS'
+    'values': 'SPANISH',
+    'values-en': 'ENGLISH',
+    'values-fr': 'FRENCH'
     # Add more mappings as needed
 }
 
 # Mapping of language names for iOS
 ios_language_mapper = {
-    'es.lproj': 'CASTELLANO',
-    'en.lproj': 'INGLES',
+    'es.lproj': 'SPANISH',
+    'en.lproj': 'ENGLISH',
     'fr.lproj': 'FRANCÉS'
     # Add more mappings as needed
 }
