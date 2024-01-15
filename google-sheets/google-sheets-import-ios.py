@@ -1,40 +1,58 @@
-import os
-from openpyxl import load_workbook
+import argparse
 import codecs
+import os
 import json
+import requests
+from lxml import etree as ET
 
-texts_ios = {}
+google_sheet_id = '1QCllfVqvAB08cBltn-iM3gogJYBMyRv2iBy8C3XytFU'
+gid='375629473'
 
 ios_language_mapper = {
-    'SPANISH': 'es.lproj',
     'ENGLISH': 'en.lproj',
+    'SPANISH': 'es.lproj',
     'FRENCH': 'fr.lproj'
     # Add more mappings as needed
 }
 
-# Initialize dictionary for iOS changes
+texts_ios = {}
 changes_ios = {}
 
-def load_ios_translations():
 
-    # Load iOS workbook
-    wb_combined = load_workbook('app_translations.xlsx')
-    sheet_ios = wb_combined['iOS']  # Get the sheet named "iOS"
+def load_translations(spreadsheet_id, worksheet_id):
+    # Download CSV content from the Google Sheet
+    csv_url = f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid={worksheet_id}'
+    response = requests.get(csv_url)
 
-    # Print values from translations in the Excel sheet
-    for row in range(2, sheet_ios.max_row + 1):
-        key = sheet_ios.cell(row=row, column=1).value
-        translations = {}
-        for col in range(2, sheet_ios.max_column + 1):
-            lang = ios_language_mapper.get(sheet_ios.cell(row=1, column=col).value, None)
-            if lang is not None:
-                translation = sheet_ios.cell(row=row, column=col).value
-                translations[lang] = translation
-        texts_ios[key] = translations
+    if response.status_code == 200:
+        # Split the content into lines
+        csv_content = response.content.decode('utf-8')
+        lines = csv_content.split('\n')
+
+        # Extract header and data
+        header = list(h.rstrip('\r') for h in lines[0].split(','))
+        data = [line.split(',') for line in lines[1:]]
+
+        # Find the column indices for each language
+        language_indices = {}
+        for column_name, lang in ios_language_mapper.items():
+
+            if column_name in header:
+                language_indices[lang] = header.index(column_name)
+
+        # Iterate over rows to populate texts_ios
+        for row in data:
+            if row:
+                key = row[0]
+                translations = {}
+                # Iterate over languages to get translations
+                for lang, index in language_indices.items():
+                    translation = row[index].strip() if index < len(row) else None
+                    translations[lang] = translation
+                    texts_ios[key] = translations
 
 
-
-def create_update_strings_file():
+def create_update_xml_file():
     strings_file = os.path.join(ios_lang, 'Localizable.strings')
 
     if not os.path.exists(strings_file):
@@ -50,7 +68,7 @@ def create_update_strings_file():
         with open(strings_file, 'r', encoding='utf-8') as ios_file:
             content = ios_file.readlines()
 
-        # Initialize changes_android[android_lang] if not exists
+        # Initialize changes_ios[ios_lang] if not exists
         if ios_lang not in changes_ios:
             changes_ios[ios_lang] = {}
 
@@ -100,10 +118,14 @@ def create_update_strings_file():
                 ios_file.write(output)
                 ios_file.close()
 
-
 if __name__ == "__main__":
-    # Main script for iOS
-    load_ios_translations()
+    parser = argparse.ArgumentParser(description='Import ios translations from Google Sheets.')
+    parser.add_argument('-spreadsheetId', type=str, help='Id of the public Google Sheet', default=google_sheet_id)
+    parser.add_argument('-gid', type=str, help='Id of the worksheet tab, you can find on the url', default=gid)
+    args = parser.parse_args()
+
+    # Main script
+    load_translations(args.spreadsheetId, args.gid)
 
     print("Processing localization files for iOS:")
 
@@ -111,11 +133,13 @@ if __name__ == "__main__":
         if not os.path.exists(ios_lang):
             os.makedirs(ios_lang)
 
-        create_update_strings_file()
+        create_update_xml_file()
 
     # Print information about the changes
-    print("Changes:")
+    print("\nChanges:")
     if all(not changes for changes in changes_ios.values()):
-        print("No Changes")
+        print("No changes")
     else:
         print(json.dumps(changes_ios, indent=2, ensure_ascii=False).encode('utf-8').decode())
+
+    print("\nFinished successfully!")

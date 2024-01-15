@@ -16,7 +16,7 @@ changes_android = {}
 
 def load_android_translations():
     # Load Android workbook
-    wb_android = load_workbook('app_translations.xlsx')
+    wb_android = load_workbook('../app_translations.xlsx')
     sheet = wb_android['Android']  # Get the sheet named "Android"
 
     # Print values from translations in the Excel sheet

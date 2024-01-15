@@ -113,8 +113,8 @@ def create_update_xml_file():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Import android translations from Google Sheets.')
-    parser.add_argument('-spreadsheetId', type=str, help='URL of the public Google Sheet', default=google_sheet_id)
-    parser.add_argument('-gid', type=str, help='URL of the public Google Sheet', default=gid)
+    parser.add_argument('-spreadsheetId', type=str, help='Id of the public Google Sheet', default=google_sheet_id)
+    parser.add_argument('-gid', type=str, help='Id of the worksheet tab, you can find on the url', default=gid)
 
     args = parser.parse_args()
 

@@ -195,7 +195,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Export translations to Google Sheets.')
     parser.add_argument('-androidSources', type=str, help='Path to Android resources folder', default='./')
     parser.add_argument('-iosSources', type=str, help='Path to iOS resources folder', default='./')
-    parser.add_argument('-spreadsheetId', type=str, help='URL of the public Google Sheet', default=google_sheet_id)
+    parser.add_argument('-spreadsheetId', type=str, help='Id of the public Google Sheet', default=google_sheet_id)
     args = parser.parse_args()
 
     export_translations(args.androidSources, args.iosSources, args.spreadsheetId)
