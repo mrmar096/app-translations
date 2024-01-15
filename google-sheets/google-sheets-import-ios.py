@@ -3,7 +3,6 @@ import codecs
 import os
 import json
 import requests
-from lxml import etree as ET
 
 google_sheet_id = '1QCllfVqvAB08cBltn-iM3gogJYBMyRv2iBy8C3XytFU'
 gid='375629473'
